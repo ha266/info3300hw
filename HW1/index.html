@@ -1,0 +1,81 @@
+<html>
+<body>
+    <pre>
+        <p id = 'p1'>
+            1. 
+                a. No 
+                b. No
+                c. Yes 
+                <script>
+                    console.log(true);
+                    console.log(typeof(true));
+                </script>
+                d. Yes
+                <script>
+                    console.log([1,2,3]);
+                    console.log(typeof([1,2,3]));
+                </script>
+                e. No
+                f. Yes 
+                <script>
+                    console.log('Hello World');
+                    console.log(typeof('Hello World'))
+                </script>
+                g. No - special objects 
+                h. No
+                i. Yes
+                <script>
+                    console.log(1);
+                    console.log(typeof(1));
+                </script>
+                j. No
+                k. No
+                l. No
+                m. Yes 
+                <script>
+                    console.log(undefined);
+                    console.log(typeof(undefined));
+                </script>
+                n. No
+                o. No 
+        </p>
+    </pre>
+    <p id='p2'>
+        2. While null is a canonical JS type, typeof(null) will say object instead of null.
+    </p>
+    <pre>
+        <p id = 'p3'>
+            3. Type coersion is when in order to stay unbothered as possible, JS interprets types on its own. 
+            One example would be 3 + "apples". In Python, this would throw a type error. 
+            Another example would be 0 == '0'. In Python, this would say false, but JS says true. 
+            <script>
+                console.log(3 + " apples");
+                console.log(0=='0');
+            </script>
+        </p>
+    </pre>
+    <p id = 'p4'>
+        <script>
+            let fib = n => {
+                if (n < 0) return undefined;
+                if (n === 0) return 0; 
+                if (n === 1) return 1; 
+                if (n === 2) return fib(0) + fib(1);
+                i = fib(n-1);
+                return i + fib(n-2);
+            }
+            console.log('-----test cases ------')
+            console.log( fib(-2) ); //undefined
+            console.log( fib(0) ); //0
+            console.log( fib(1) ); //1
+            console.log( fib(4) ); //3
+            console.log( fib(7) ); //13
+            console.log( fib(9) ); //34
+        </script>
+    </p>
+    <p id = 'p5'>
+        5. They will not receive any credit.
+    </p>
+</body>
+
+</html>

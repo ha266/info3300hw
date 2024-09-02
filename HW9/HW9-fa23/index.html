@@ -1,0 +1,208 @@
+<html>
+    <head>
+        <script src = "https://d3js.org/d3.v7.min.js"></script>
+        <style>
+  
+            .gridlines line {
+              stroke: #bbb;
+            }
+            
+            .gridlines .domain {
+              stroke: none;
+            }
+            
+          
+            </style>
+ 
+    </head>
+    <body>
+        <p>Adrianna Ahn, ha266</p>
+        <p>
+            <svg height="700" width="600" id="lollipop"> 
+                <!-- <text id="label1970"></text>
+                <text id="label2020"></text> -->
+                <defs>
+                    <marker id="start" markerWidth="1" markerHeight="6" refX="-2" refY="3" orient="auto"> <path d="M 0 0 V 6 H 1 V 0 Z" />
+                    </marker>
+                    <marker id="end" markerWidth="6" markerHeight="4" refX="7" refY="2" orient="auto">
+                    <path d="M 0 0 V 4 L 6 2 Z" /> </marker>
+                </defs>
+             </svg>
+             <script>
+                let margin = { "top": 10, "right": 10, "bottom": 45, "left": 45};
+                const svg = d3.select('svg#lollipop');
+                const width = svg.attr('width');
+                const height = svg.attr('height');
+                const chartWidth = width - margin.left - margin.right;
+                const chartHeight = height - margin.bottom - margin.top;
+                
+
+                const requestData = async function() {
+                    let artists = await d3.json('artists.json');
+                    console.log(artists);
+
+                    let percentScale = d3.scaleLinear().domain([0, 1]).range([chartHeight, 0]);
+                    let cateScale = d3.scalePoint().domain(d3.map(artists, d => d.category)).range([0, chartWidth]).padding(0.2);
+                    
+                    let yAxis = d3.axisLeft(percentScale);
+                    svg.append('g')
+                    .attr('class', 'y axis')
+                    .attr('transform', `translate(${margin.left - 10}, ${margin.top})`)
+                    .call(yAxis);
+
+                    let yGrid = d3.axisLeft(percentScale)
+                    .tickSize(-chartWidth-10)
+                    .tickFormat('');
+
+                    svg.append('g')
+                    .attr('class', 'y gridlines')
+                    .attr('transform', `translate(${margin.left - 10}, ${margin.top})`)
+                    .call(yGrid);
+
+                    let xAxis = d3.axisBottom(cateScale);
+                    svg.append('g')
+                    .attr('class', 'x axis')
+                    .attr('transform', `translate(${margin.left}, ${chartHeight+margin.top+10})`)
+                    .call(xAxis);
+
+                    let xGrid = d3.axisBottom(cateScale)
+                    .tickSize(chartHeight+10)
+                    .tickFormat('');
+
+                    svg.append('g')
+                    .attr('class', 'x gridlines')
+                    .attr('transform',`translate(${margin.left}, ${margin.top})`)
+                    .call(xGrid);   
+
+                    let chart = svg.append('g')
+                    //.attr('class', 'chart')
+                    .attr('transform',`translate(${margin.left},${margin.top})`);
+
+                    let lollipops = chart.selectAll('g').data(artists)
+                    .join('g')
+                    .attr('class', 'lollipop');
+
+                    // let lollipops = chart.selectAll('g');
+                    // console.log(lollipops);
+
+                    lollipops.each( function(d) { 
+                        console.log(this, d);
+
+                         d3.select(this, d).append('circle')
+                        .attr('cx', d => cateScale(d['category']))
+                        .attr('cy', d => percentScale(d['1970']))
+                        .attr('r', 8)
+                        .attr('fill', 'darkred')
+                        .attr('stroke', 'black')
+                        .attr('stroke-width', 1);
+
+                        d3.select(this, d).append('circle')
+                        .attr('cx', d => cateScale(d['category']))
+                        .attr('cy', d => percentScale(d['2020']))
+                        .attr('r', 8)
+                        .attr('fill', 'blue')
+                        .attr('stroke', 'black')
+                        .attr('stroke-width', 1);
+
+                        
+                        line = d3.select(this, d).append('line')
+                        .attr('x1', d => cateScale(d['category']))
+                        .attr('x2', d => cateScale(d['category']))
+                        .attr('y1', d => percentScale(d['1970']))
+                        .attr('y2', d => percentScale(d['2020']))
+                        .attr('stroke', 'black')
+                        .attr('stroke-width', 4);
+
+
+                        if (Math.abs(line.attr('y2') - line.attr('y1')) > 30) {
+                            d3.select(this, d).append('line')
+                            .attr('x1', d => cateScale(d['category']))
+                            .attr('x2', d => cateScale(d['category']))
+                            .attr('y1', d => percentScale(d['1970']))
+                            .attr('y2', d => percentScale(d['2020']))
+                            .attr('stroke', 'black')
+                            .attr('stroke-width', 4)
+                            .attr("marker-start", "url(#start)") 
+                            .attr("marker-end", "url(#end)")
+                        }
+                    });
+
+                    label1970 = chart.selectAll('g').append('text')
+                    .attr('class', 'label1970')
+                    
+
+                    label2020 = chart.append('text')
+                    .attr('class', 'label2020')
+
+
+                    lollipops.on('mouseover', function(){
+                        d3.select(this)
+                        .selectAll('circle')
+                        .attr('stroke-width', 3)
+
+                        _1970 = Math.round((d3.select(this).selectAll('circle').datum()['1970'])* 100);
+                        _2020 = Math.round((d3.select(this).selectAll('circle').datum()['2020'])* 100);
+
+                        d = d3.select(this).selectAll('circle').datum()
+
+                        console.log(d['category'])
+
+
+                        if (['Male', 'Female', 'W Europe', 'E Europe'].includes(d['category'])) {
+
+                            console.log('y')
+                            label1970.attr('x', cateScale(d['category']) - 30)
+                            .attr('y', percentScale(d['1970']))
+                            .text(_1970)
+                            .attr('text-anchor', 'start')
+
+                            label2020.attr('x', cateScale(d['category']) - 30)
+                            .attr('y', percentScale(d['2020']))
+                            .text(_2020)
+                            .attr('text-anchor', 'start')
+
+                            
+                        }
+                        else {
+                            label1970.attr('x', cateScale(d['category']) + 10)
+                            .attr('y', percentScale(d['1970']))
+                            .text(_1970)
+                            .attr('text-anchor', 'right')
+
+                            label2020.attr('x', cateScale(d['category']) + 10)
+                            .attr('y', percentScale(d['2020']))
+                            .text(_2020)
+                            .attr('text-anchor', 'right')
+
+                        }
+
+                        
+
+
+                        // d3.select(this)
+                        // .select('#label1970')
+                        // .attr('x', d => percentScale(['1970']))
+                        // .attr('y', d => cateScale(d['1970']))
+                        // .attr('text-anchor', 'middle')
+
+
+
+                    })
+
+                    lollipops.on('mouseout', function(){
+                        d3.select(this)
+                        .selectAll('circle')
+                        .attr('stroke-width', 1)
+
+                        label1970.text('');
+                        label2020.text('')
+
+
+                    })
+
+                }
+                requestData();
+             </script>               
+        </p>
+    </body>
+</html>

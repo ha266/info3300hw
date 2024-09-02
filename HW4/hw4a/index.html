@@ -1,0 +1,107 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <style>
+  
+            .gridlines line {
+              stroke: #bbb;
+            }
+            
+            .gridlines .domain {
+              stroke: none;
+            }
+          
+            </style>
+          
+    </head>
+    <body>
+        <h3>Adrianna Ahn, ha266</h3>
+        <p>
+            1. a) marks - the different states on the map
+            <br>
+                channels - color hue
+            <br>
+            b) marks - circles 
+            <br>
+                channels - both vertical and horizontal aligned positions, color hue
+        </p>
+        <p>
+            <pre>
+3. 
+<svg id = 'p3' height = '500' width = '500'>
+
+</svg>
+<script id="p3">
+    const svg = d3.select('svg#p3');
+    const width = svg.attr('width');
+    const height = svg.attr('height');
+    const margins = {top: 10, right: 10, bottom: 30, left: 30};
+    const chartWidth = width - margins.left - margins.right;
+    const chartHeight = height - margins.bottom - margins.top;
+
+    let chart = svg.append('g')
+                .attr('class', 'chart')
+                .attr('transform',`translate(${margins.left},${margins.top})`);
+
+    d3.json('chip_dataset.json').then( (data) => {
+        data.forEach(d => {
+            d['Release Day'] = Number(d['Release Day']);
+            d['Transistors(million)'] = Number(d['Transistors(million)']);
+
+        });
+// 3. c)
+        const rdExtent = d3.extent(data, d => d['Release Day']);
+        const tExtent = d3.extent(data, d => d['Transistors(million)']);
+
+        const rdScale = d3.scaleLinear().domain(rdExtent).range([0,chartWidth]);
+        const tScale = d3.scaleLog().domain(tExtent).range([chartHeight, 0]);
+
+        let xAxis = d3.axisBottom(rdScale);
+
+        svg.append('g')
+            .attr('class', 'x axis')
+            .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
+            .call(xAxis);
+
+        let yAxis = d3.axisLeft(tScale);
+
+        svg.append('g')
+            .attr('class', 'y axis')
+            .attr('transform', `translate(${margins.left-10},${margins.top})`)
+            .call(yAxis);
+
+        let xGrid = d3.axisBottom(rdScale)
+        .tickSize(chartHeight)
+        .tickFormat('');
+
+        svg.append('g')
+        .attr('class', 'x gridlines')
+        .attr('transform', `translate(${margins.left},${margins.top})`)
+        .lower()
+        .call(xGrid);
+
+        let yGrid = d3.axisLeft(tScale)
+        .tickSize(-chartWidth-10)
+        .tickFormat('')
+        
+        svg.append('g')
+        .attr('class', 'y gridlines')
+        .attr('transform', `translate(${margins.left-10}, ${margins.top})`)
+        .lower()
+        .call(yGrid);
+
+        data.forEach((d)=>{
+            chart.append('circle')
+            .attr('r', 3)
+            .attr('cx', rdScale(d['Release Day']))
+            .attr('cy', tScale(d['Transistors(million)']))
+            .attr('opacity', 0.3)
+            .attr('fill', 'darkblue');
+        })
+
+    })
+</script>
+            </pre>
+        </p>
+    </body>
+</html>

@@ -1,0 +1,116 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+          
+    </head>
+    <body>
+        <h3>Adrianna Ahn, ha266</h3>
+
+        <ul>
+            <li>
+                1 a. This is a divergent scale. It is an effective divergent scale because it has a neutral mid scale and
+                two extreme end scales. 
+            </li>
+            <li>
+                1 b. No, because the scale range is small, and it would be relatively hard to differentiate between similar
+                values. Also, due to the x,y scale, it seems more natural for the numbers to go from -1 to 1, instead of 1 to -1. 
+            </li>
+            <li>
+                1 c. Monochromacy/Achromatopsia, Blue-Blind/Tritanopia. There are some deficiencies such as 
+                Red-Blind/Protanopia that hinders the colors to be represented exactly, but hue variation is still possible. 
+            </li>
+            <li>
+                1 d. Yes, but I would recommend using additional visual channels to represent the variation, since the rainbow
+                scale alone may be hard to differentiate for certain people, and for certain close-range values. 
+            </li>
+        </ul>
+        <p>
+            <svg id = 'p2' height = '500' width = '500' style= 'background:black'> </svg>
+            <script id = 'p2'>
+                const svg = d3.select('svg#p2');
+                d3.csv('NCAA_shots.csv').then( (data) => {
+
+                        const aExtent = d3.extent(data, d => d['log_attempt'])
+                       
+                        const colorScale = d3.scaleSequential().domain(aExtent)
+                                   .interpolator(d3.interpolateViridis)
+                        
+                        data.forEach((d) => {
+                            svg.append('rect')
+                            .attr('x', 5*d['x'])
+                            .attr('y', 5*d['y'])
+                            .attr('width', 5)
+                            .attr('height', 5)
+                            .attr('fill', colorScale(d.log_attempt))
+                        });
+                    }
+                )
+
+            </script>
+            2 b. One advantage of using the log scale is that if there is a big difference between the values, the scale 
+            is able to display the smaller values without it being one blob. A disadvantage would be that if the values 
+            are all close, it would be hard to see a 
+            difference. 
+        </p>
+        <p>
+            <svg id = 'p3' height = 420 width = 420> </svg>
+            <script id = 'p3'>
+                let arr = [];
+                let s = 0;
+                let h = 0;
+                let counter = 0;
+
+                for (i=0; i<21; i++) {
+                    for (j=0; j<21; j++){
+                        arr.push({'s':s})
+                    }
+                    s = s + 5;
+                }
+                for (i=0; i<441; i++){
+                    arr[i].h = h;
+                    counter ++;
+                    h = h + 18;
+                    if (counter === 21) {
+                        counter = 0;
+                        h = 0
+                    };
+                }
+
+            // 3 b. 
+            const svg3 = d3.select('svg#p3');
+            const xExtent = d3.extent(arr, r => r.h);
+            const yExtent = d3.extent(arr, r => r.s);
+
+            const xScale = d3.scaleLinear().domain(xExtent).range([10,svg3.attr('width')-10]);
+            const yScale = d3.scaleLinear().domain(yExtent).range([svg3.attr('height')-10, 10]);
+            const sScale = d3.scaleLinear().domain(yExtent).range([0,1]);
+            const lScale = d3.scaleLinear().domain([0,100]).range([0,1]);
+            
+            function showCircles(lightness) {
+                svg3.selectAll("circle").data(arr)
+                    .join(
+                        enter => { 
+                            enter.append('circle')
+                            .attr('cx', r => xScale(r.h))
+                            .attr('cy', r => yScale(r.s))
+                            .attr('fill', r => d3.hsl(r.h, sScale(r.s), lScale(lightness)))
+                            .attr('r', 10)
+                        },
+                        update => {update
+                        .attr('fill', r => d3.hsl(r.h, sScale(r.s), lScale(lightness)))}
+                
+                    )};
+
+            showCircles(50)
+
+            svg3.selectAll("circle").on("input", function( event ) {
+                d3.select(this).showCircles(this.value);
+            })
+
+
+            </script>
+            <input type = 'range' id = 'input' name = 'slider' min = '0' max = '100' step = '1'>
+
+        </p>
+    </body>
+</html>

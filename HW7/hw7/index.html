@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v7.min.js"></script> 
+        <script src="https://d3js.org/topojson.v3.min.js"></script>
+    </head>
+    <body>
+        <p> Adrianna Ahn, ha266</p>
+        <p>
+            <svg id="choropleth" height="770" width="990" style="margin:20px"></svg>
+
+            <script id = 'p1'>
+                const svg = d3.select('#choropleth');
+                const width = svg.attr('width');
+                const height = svg.attr('height');
+                const margin = {top:20, bottom:20, left:20, right:20};
+                const mapWidth = width - margin.left - margin.right;
+                const mapHeight = height - margin.top - margin.bottom;
+
+                const requestData = async function() {
+                    const nyincome = await d3.json('ny_income.topo.json');
+
+                    console.log(nyincome);
+
+                    var zips = topojson.feature(nyincome, nyincome.objects.zip_codes);
+                    var zipmesh = topojson.mesh(nyincome, nyincome.objects.zip_codes);
+                    var statemesh = topojson.mesh(nyincome, nyincome.objects.state);
+
+                    var projection = d3.geoMercator().fitSize([mapWidth,mapHeight]);
+                    var path = d3.geoPath().projection(projection);
+
+                    const colors = ['#F0F8FF', '#0000FF', '#FF1493', '#F0FFF0', '#98FB98']
+
+                    const geometries = topojson.feature(nyincome, nyincome.objects.zip_codes.geometries)
+                    const zipDomain = d3.map(geometries, d => d.properties.median_income)
+                    console.log(zipDomain);
+
+                }
+                requestData();
+            </script>
+        </p>
+    </body>
+</html>
